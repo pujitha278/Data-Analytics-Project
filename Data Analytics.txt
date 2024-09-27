@@ -1,0 +1,127 @@
+# Importing necessary libraries
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Assuming you have the dataset loaded as a CSV
+# Replace 'your_dataset.csv' with the actual file name
+df = pd.read_csv('your_dataset.csv')
+
+# Show the first few rows of the dataset
+df.head()
+
+# Display basic information about the dataset
+df.info()
+
+# Describe the dataset for Likert scale values (assuming numeric columns)
+df.describe()
+
+# Display the column names
+df.columns
+
+# Checking for missing values
+missing_values = df.isnull().sum()
+print(missing_values)
+
+# Visualizing missing values using a heatmap
+plt.figure(figsize=(10, 6))
+sns.heatmap(df.isnull(), cbar=False, cmap='viridis')
+plt.title('Missing Values Heatmap')
+plt.show()
+
+# Calculating Spearman correlation for Likert data
+spearman_corr = df.corr(method='spearman')
+
+# Visualizing the correlation heatmap
+plt.figure(figsize=(12, 8))
+sns.heatmap(spearman_corr, annot=True, cmap='coolwarm', center=0)
+plt.title('Spearman Correlation Heatmap')
+plt.show()
+
+# Example for Cramer's V (for categorical columns)
+from association_metrics import cramers_v
+
+categorical_columns = ['column1', 'column2']  # Replace with actual column names
+for col in categorical_columns:
+    cramers_v_value = cramers_v(df[col], df['target_column'])  # Replace 'target_column'
+    print(f'Cramer's V for {col} and target: {cramers_v_value}')
+
+# Counting the number of projects per city
+city_project_count = df['City'].value_counts()
+
+# Visualizing city-wise project count
+plt.figure(figsize=(12, 6))
+city_project_count.plot(kind='bar', color='skyblue')
+plt.title('Number of Projects per City')
+plt.xlabel('City')
+plt.ylabel('Number of Projects')
+plt.xticks(rotation=90)
+plt.show()
+
+# Grouping by rating and visualizing purchase decisions
+rating_purchase = df.groupby('Customer_Rating')['Purchase_Decision'].value_counts().unstack()
+
+# Visualizing with a bar plot
+rating_purchase.plot(kind='bar', stacked=True, figsize=(12, 6))
+plt.title('Ratings Affecting Purchase Decisions')
+plt.xlabel('Customer Rating')
+plt.ylabel('Count of Purchase Decisions')
+plt.show()
+
+# Grouping cities by type of house
+city_house_count = df.groupby(['City', 'House_Type']).size().unstack(fill_value=0)
+
+# Visualizing city-wise house type distribution
+city_house_count.plot(kind='bar', stacked=True, figsize=(12, 6), colormap='viridis')
+plt.title('Distribution of House Types per City')
+plt.xlabel('City')
+plt.ylabel('Number of Houses')
+plt.xticks(rotation=90)
+plt.show()
+
+# Boxplot for average monthly income per city
+plt.figure(figsize=(12, 6))
+sns.boxplot(x='City', y='Average_Monthly_Income', data=df)
+plt.title('Average Monthly Income per City')
+plt.xticks(rotation=90)
+plt.show()
+
+# Bar plot for house type distribution
+house_type_count = df['House_Type'].value_counts()
+
+plt.figure(figsize=(8, 5))
+house_type_count.plot(kind='bar', color='orange')
+plt.title('Distribution of House Types')
+plt.xlabel('House Type')
+plt.ylabel('Count')
+plt.show()
+
+# Bar plot for customers with active EMIs
+emi_count = df['Active_EMI'].value_counts()
+
+plt.figure(figsize=(8, 5))
+emi_count.plot(kind='bar', color='green')
+plt.title('Customers with Active EMI')
+plt.xlabel('Active EMI')
+plt.ylabel('Count')
+plt.show()
+
+# Histogram for roof percentage available for solar installation
+plt.figure(figsize=(10, 6))
+df['Roof_Percentage'].hist(bins=20, color='purple')
+plt.title('Percentage of Roof for Solar Installation')
+plt.xlabel('Roof Percentage')
+plt.ylabel('Count')
+plt.show()
+
+def plot_custom_condition(df, x_var, y_var, condition):
+    filtered_df = df[df[condition] == True]  # Filter based on some condition
+    plt.figure(figsize=(10, 6))
+    sns.barplot(x=x_var, y=y_var, data=filtered_df)
+    plt.title(f'{y_var} by {x_var} under {condition}')
+    plt.xticks(rotation=90)
+    plt.show()
+
+# Example usage
+plot_custom_condition(df, 'City', 'Average_Monthly_Income', 'Active_EMI')
